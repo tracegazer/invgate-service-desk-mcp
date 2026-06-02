@@ -1,0 +1,20 @@
+# InvGate Service Desk MCP — configuration template
+# Copy to: ~/.config/invgate-service-desk-mcp/config.toml
+#
+#   mkdir -p ~/.config/invgate-service-desk-mcp
+#   cp config.toml.example ~/.config/invgate-service-desk-mcp/config.toml
+#
+# Environment variables always override these values.
+
+base_url = "https://acme.sd.cloud.invgate.net"
+api_token = "your-api-token"
+# api_username = "api"        # optional, defaults to "api"
+
+# enable_writes = false       # set true to register write tools (create/update tickets)
+
+# telemetry_enabled = false   # set true to enable OpenTelemetry traces/metrics/logs
+# telemetry_detail = "metadata"  # metadata (default) | ids | full
+
+# OTLP export endpoint and headers are configured via standard OTel env vars:
+#   OTEL_EXPORTER_OTLP_ENDPOINT, OTEL_EXPORTER_OTLP_HEADERS, OTEL_SERVICE_NAME
+# See README.md for examples (Dynatrace, generic OTLP collector).

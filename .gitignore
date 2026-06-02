@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+
+# Tooling
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Env / secrets
+.env
+*.env
+config.toml
+datos_utiles.txt
+
+# OS
+.DS_Store
+
+# Internal planning artifacts (superpowers skill output)
+docs/superpowers/
+
+# Knowledge base raw exports (local only — contain customer data)
+base_conocimiento/*.csv
+base_conocimiento/*.xls
+base_conocimiento/*.xlsx
+base_conocimiento/*.md
+base_conocimiento/datos_utiles.txt
