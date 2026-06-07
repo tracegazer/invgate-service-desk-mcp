@@ -252,7 +252,7 @@ def register(mcp: "FastMCP", client: InvGateClient) -> None:
         )
 
     # Write tools are registered only when the operator has opted in.
-    if client.writes_enabled:
+    if client.writes_enabled_for("incidents"):
         _register_writes(mcp, client)
 
 
