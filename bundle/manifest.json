@@ -1,0 +1,60 @@
+{
+  "$schema": "https://raw.githubusercontent.com/modelcontextprotocol/mcpb/main/dist/dxt-manifest.schema.json",
+  "manifest_version": "0.4",
+  "name": "invgate-service-desk-mcp",
+  "display_name": "InvGate Service Desk",
+  "version": "0.1.3",
+  "description": "MCP server for the InvGate Service Desk API (incidents, users, KB, workflows, assets).",
+  "long_description": "Exposes InvGate Service Desk operations as MCP tools: incidents CRUD and filtering, users and groups, custom fields, knowledge base, workflows, assets/CIs, breaking news, triggers, time tracking, and data export. Read-only by default; write operations are opt-in via INVGATE_WRITE_PROFILE (none | support | full).",
+  "author": {
+    "name": "tracegazer",
+    "email": "carlsuarez.07@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tracegazer/invgate-service-desk-mcp.git"
+  },
+  "license": "MIT",
+  "keywords": ["invgate", "service-desk", "itsm", "mcp"],
+  "server": {
+    "type": "python",
+    "entry_point": "server/main.py",
+    "mcp_config": {
+      "command": "uvx",
+      "args": ["invgate-service-desk-mcp"],
+      "env": {
+        "INVGATE_BASE_URL": "${user_config.INVGATE_BASE_URL}",
+        "INVGATE_API_TOKEN": "${user_config.INVGATE_API_TOKEN}",
+        "INVGATE_WRITE_PROFILE": "${user_config.INVGATE_WRITE_PROFILE}"
+      }
+    }
+  },
+  "user_config": {
+    "INVGATE_BASE_URL": {
+      "type": "string",
+      "title": "InvGate Base URL",
+      "description": "Your InvGate instance URL, e.g. https://acme.sd.cloud.invgate.net",
+      "required": true
+    },
+    "INVGATE_API_TOKEN": {
+      "type": "string",
+      "title": "InvGate API Token",
+      "description": "API token used to authenticate against the InvGate Service Desk API.",
+      "required": true,
+      "sensitive": true
+    },
+    "INVGATE_WRITE_PROFILE": {
+      "type": "string",
+      "title": "Write Profile",
+      "description": "Which write operations are enabled: none (read-only, default), support, or full.",
+      "required": false,
+      "default": "none"
+    }
+  },
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "python": ">=3.12,<4.0"
+    }
+  }
+}
