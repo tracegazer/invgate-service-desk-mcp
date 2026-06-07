@@ -56,8 +56,12 @@ class InvGateClient:
 
     @property
     def writes_enabled(self) -> bool:
-        """Whether write tools may be registered (operator opt-in)."""
-        return self._config.enable_writes
+        """Whether ANY write tools are enabled (used by the insecure-transport warning)."""
+        return bool(self._config.write_domains)
+
+    def writes_enabled_for(self, domain: str) -> bool:
+        """Whether write tools for a specific domain (e.g. 'incidents', 'kb') are enabled."""
+        return domain in self._config.write_domains
 
     async def get(self, endpoint: str, params: dict[str, Any] | None = None) -> Any:
         """Issue a GET to an InvGate endpoint key (e.g. 'incident', 'incidents.by.status')."""

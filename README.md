@@ -81,6 +81,14 @@ Restart Claude Desktop. That's it — start asking about your tickets.
 <details>
 <summary>Enabling write operations</summary>
 
+By default the server is **read-only**. Opt into writes with `INVGATE_WRITE_PROFILE`:
+
+| Profile          | Reads      | Writes                                                            |
+|------------------|------------|-------------------------------------------------------------------|
+| `none` (default) | everything | nothing                                                           |
+| `support`        | everything | incidents (tickets, comments, reassign, approve) + time tracking  |
+| `full`           | everything | incidents + time tracking + Knowledge Base                        |
+
 ```jsonc
 {
   "mcpServers": {
@@ -90,12 +98,16 @@ Restart Claude Desktop. That's it — start asking about your tickets.
       "env": {
         "INVGATE_BASE_URL": "https://acme.sd.cloud.invgate.net",
         "INVGATE_API_TOKEN": "your-api-token",
-        "INVGATE_ENABLE_WRITES": "1"
+        "INVGATE_WRITE_PROFILE": "support"
       }
     }
   }
 }
 ```
+
+> **Compatibility:** the legacy `INVGATE_ENABLE_WRITES=1` still works and maps to `full`.
+> If both are set, the profile wins and a warning is printed to stderr. Note: `support`
+> deliberately keeps the Knowledge Base read-only. An invalid profile name fails fast at startup.
 
 > **Warning:** write mode lets the connected agent create, modify, and delete real content through your InvGate credential. There is no API to delete a ticket — created tickets can only be cancelled, not removed.
 
@@ -117,7 +129,7 @@ Configuration resolves in this order (highest priority first):
 | `INVGATE_BASE_URL` | `base_url` | Instance URL, e.g. `https://acme.sd.cloud.invgate.net` |
 | `INVGATE_API_TOKEN` | `api_token` | API token (HTTP Basic password) |
 | `INVGATE_API_USERNAME` | `api_username` | HTTP Basic username (optional, defaults to `api`) |
-| `INVGATE_ENABLE_WRITES` | `enable_writes` | Opt-in for write tools (default: `false`) |
+| `INVGATE_WRITE_PROFILE` | `write_profile` | Write access profile: `none` (default), `support`, or `full` |
 | `INVGATE_TELEMETRY` | `telemetry_enabled` | Enable OpenTelemetry (default: `false`) |
 | `INVGATE_TELEMETRY_DETAIL` | `telemetry_detail` | Span detail: `metadata` (default), `ids`, or `full` |
 
@@ -126,7 +138,7 @@ Configuration resolves in this order (highest priority first):
 base_url = "https://acme.sd.cloud.invgate.net"
 api_token = "..."
 # api_username = "api"
-# enable_writes = false
+# write_profile = "none"  # "none" (default) | "support" | "full"
 # telemetry_enabled = false
 # telemetry_detail = "metadata"
 ```

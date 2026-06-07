@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import sys
 import tomllib
 from collections.abc import Mapping
 from dataclasses import dataclass
@@ -20,6 +21,14 @@ class ConfigError(Exception):
 _TRUTHY = {"1", "true", "yes", "on"}
 _TELEMETRY_DETAILS = {"metadata", "ids", "full"}
 
+# Named write profiles → the set of domains whose write tools get registered.
+# "support" deliberately excludes "kb": a support agent reads the KB but does not edit it.
+WRITE_PROFILES: dict[str, frozenset[str]] = {
+    "none": frozenset(),
+    "support": frozenset({"incidents", "timetracking"}),
+    "full": frozenset({"incidents", "kb", "timetracking"}),
+}
+
 
 @dataclass(frozen=True)
 class Config:
@@ -28,19 +37,39 @@ class Config:
     # InvGate SD authenticates with HTTP Basic: username + API token as password.
     # The username is "api" on standard instances; kept configurable for flexibility.
     api_username: str = "api"
-    # Write tools (create/update/delete) are registered only when this is enabled.
-    # Off by default so the server is read-only unless the operator opts in.
+    # Write tools are registered per-domain according to the resolved profile.
+    # "none" (default) is read-only. `enable_writes` is the legacy alias for "full".
+    write_profile: str = "none"
+    # Legacy alias for the "full" profile, honored only on direct construction.
+    # NOT populated by Config.load() (it routes the alias through write_profile),
+    # so this field is unreliable at runtime — read write_domains instead.
     enable_writes: bool = False
+    # Derived in __post_init__ from write_profile (or enable_writes). Do not set directly.
+    write_domains: frozenset[str] = frozenset()
     # Telemetry (OpenTelemetry) is off unless the operator opts in.
     telemetry_enabled: bool = False
     # Span attribute detail: "metadata" (default) | "ids" | "full". Metrics are
     # always low-cardinality regardless of this setting.
     telemetry_detail: str = "metadata"
 
+    def __post_init__(self) -> None:
+        if self.write_profile not in WRITE_PROFILES:
+            valid = ", ".join(WRITE_PROFILES)
+            raise ValueError(
+                f"Invalid write profile {self.write_profile!r}. Valid: {valid}."
+            )
+        if self.write_profile != "none":
+            domains = WRITE_PROFILES[self.write_profile]
+        elif self.enable_writes:
+            domains = WRITE_PROFILES["full"]
+        else:
+            domains = WRITE_PROFILES["none"]
+        object.__setattr__(self, "write_domains", domains)
+
     def __repr__(self) -> str:
         return (
             f"Config(base_url={self.base_url!r}, api_token='***', "
-            f"api_username={self.api_username!r}, enable_writes={self.enable_writes}, "
+            f"api_username={self.api_username!r}, write_profile={self.write_profile!r}, "
             f"telemetry_enabled={self.telemetry_enabled}, "
             f"telemetry_detail={self.telemetry_detail!r})"
         )
@@ -61,7 +90,7 @@ class Config:
             or file_values.get("api_username")
             or "api"
         )
-        enable_writes = _resolve_enable_writes(env, file_values)
+        write_profile = _resolve_write_profile(env, file_values)
         telemetry_enabled = _resolve_truthy(
             env, file_values, "INVGATE_TELEMETRY", "telemetry_enabled"
         )
@@ -91,7 +120,7 @@ class Config:
             base_url=base_url.rstrip("/"),
             api_token=api_token,
             api_username=api_username,
-            enable_writes=enable_writes,
+            write_profile=write_profile,
             telemetry_enabled=telemetry_enabled,
             telemetry_detail=telemetry_detail,
         )
@@ -99,6 +128,27 @@ class Config:
 
 def _resolve_enable_writes(env: Mapping[str, str], file_values: dict) -> bool:
     return _resolve_truthy(env, file_values, "INVGATE_ENABLE_WRITES", "enable_writes")
+
+
+def _resolve_write_profile(env: Mapping[str, str], file_values: dict) -> str:
+    """Resolve the write profile. Precedence: explicit profile > ENABLE_WRITES alias > none.
+
+    A profile set alongside a truthy ENABLE_WRITES wins; we warn so the operator
+    notices the alias is being ignored. An invalid profile string is left as-is so
+    Config.__post_init__ fails fast with the full list of valid values.
+    """
+    raw = env.get("INVGATE_WRITE_PROFILE") or file_values.get("write_profile")
+    profile = raw.strip().lower() if raw else None
+    alias_full = _resolve_enable_writes(env, file_values)
+    if profile is not None:
+        if alias_full and profile != "full":
+            print(
+                "WARNING: both INVGATE_WRITE_PROFILE and INVGATE_ENABLE_WRITES are set; "
+                f"using profile '{profile}' and ignoring INVGATE_ENABLE_WRITES.",
+                file=sys.stderr,
+            )
+        return profile
+    return "full" if alias_full else "none"
 
 
 def _resolve_truthy(

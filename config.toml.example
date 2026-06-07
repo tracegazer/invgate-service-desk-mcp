@@ -10,7 +10,8 @@ base_url = "https://acme.sd.cloud.invgate.net"
 api_token = "your-api-token"
 # api_username = "api"        # optional, defaults to "api"
 
-# enable_writes = false       # set true to register write tools (create/update tickets)
+# Write access profile: "none" (default, read-only) | "support" | "full"
+write_profile = "none"
 
 # telemetry_enabled = false   # set true to enable OpenTelemetry traces/metrics/logs
 # telemetry_detail = "metadata"  # metadata (default) | ids | full

@@ -239,7 +239,7 @@ def register(mcp: "FastMCP", client: InvGateClient) -> None:
         return await get_kb_categories_by_ids_fn(client, category_ids)
 
     # Write tools are registered only when the operator has opted in.
-    if client.writes_enabled:
+    if client.writes_enabled_for("kb"):
         _register_writes(mcp, client)
 
 

@@ -137,7 +137,7 @@ def register(mcp: "FastMCP", client: InvGateClient) -> None:
         return await list_time_tracking_categories_fn(client, category_id)
 
     # Write tools are registered only when the operator has opted in.
-    if client.writes_enabled:
+    if client.writes_enabled_for("timetracking"):
         _register_writes(mcp, client)
 
 

@@ -258,6 +258,53 @@ async def test_get_incident_tool_routes_to_api(client):
     assert "Printer down" in str(structured)
 
 
+async def test_support_profile_registers_incident_and_time_writes_not_kb():
+    client = InvGateClient(
+        Config(base_url=BASE, api_token="tok", write_profile="support")
+    )
+    try:
+        mcp = build_server(client)
+        names = {t.name for t in await mcp.list_tools()}
+    finally:
+        await client.aclose()
+
+    assert "create_incident" in names
+    assert "log_time" in names
+    assert "create_kb_article" not in names
+
+
+async def test_full_profile_registers_kb_writes():
+    client = InvGateClient(Config(base_url=BASE, api_token="tok", write_profile="full"))
+    try:
+        mcp = build_server(client)
+        names = {t.name for t in await mcp.list_tools()}
+    finally:
+        await client.aclose()
+
+    assert "create_kb_article" in names
+
+
+async def test_none_profile_registers_no_writes(client):
+    mcp = build_server(client)
+    names = {t.name for t in await mcp.list_tools()}
+
+    assert "create_incident" not in names
+    assert "log_time" not in names
+    assert "create_kb_article" not in names
+
+
+def test_write_profile_banner_lists_resolved_profile():
+    from invgate_service_desk_mcp.server import write_profile_banner
+
+    cfg_none = Config(base_url=BASE, api_token="tok")
+    assert "none" in write_profile_banner(cfg_none)
+
+    cfg_support = Config(base_url=BASE, api_token="tok", write_profile="support")
+    line = write_profile_banner(cfg_support)
+    assert "support" in line
+    assert "incidents" in line and "timetracking" in line
+
+
 async def test_build_server_uses_instrumented_fastmcp_when_telemetry_passed():
     client = InvGateClient(Config(base_url="https://x.net", api_token="t"))
     mcp = build_server(client, telemetry=Telemetry())
