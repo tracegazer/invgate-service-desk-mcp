@@ -3,6 +3,46 @@ from pathlib import Path
 import pytest
 
 from invgate_service_desk_mcp.config import Config, ConfigError
+from invgate_service_desk_mcp.config import WRITE_PROFILES
+
+
+def test_write_profiles_map_contents():
+    assert WRITE_PROFILES["none"] == frozenset()
+    assert WRITE_PROFILES["support"] == frozenset({"incidents", "timetracking"})
+    assert WRITE_PROFILES["full"] == frozenset({"incidents", "kb", "timetracking"})
+
+
+def test_config_default_profile_is_none_with_no_write_domains():
+    config = Config(base_url="https://x.sd.cloud.invgate.net", api_token="tok")
+    assert config.write_profile == "none"
+    assert config.write_domains == frozenset()
+
+
+def test_config_support_profile_derives_domains():
+    config = Config(
+        base_url="https://x.sd.cloud.invgate.net",
+        api_token="tok",
+        write_profile="support",
+    )
+    assert config.write_domains == frozenset({"incidents", "timetracking"})
+
+
+def test_config_enable_writes_true_maps_to_full_domains():
+    config = Config(
+        base_url="https://x.sd.cloud.invgate.net",
+        api_token="tok",
+        enable_writes=True,
+    )
+    assert config.write_domains == frozenset({"incidents", "kb", "timetracking"})
+
+
+def test_config_invalid_profile_raises():
+    with pytest.raises(ValueError, match="Invalid write profile 'supprt'"):
+        Config(
+            base_url="https://x.sd.cloud.invgate.net",
+            api_token="tok",
+            write_profile="supprt",
+        )
 
 
 def test_loads_from_env_vars():
