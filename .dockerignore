@@ -1,0 +1,11 @@
+.git
+.venv
+dist
+tests
+docs
+htmlcov
+__pycache__
+*.pyc
+.pytest_cache
+.ruff_cache
+linkedin_draft.md

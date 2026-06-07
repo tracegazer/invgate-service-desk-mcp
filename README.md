@@ -1,5 +1,7 @@
 # invgate-service-desk-mcp
 
+<!-- mcp-name: io.github.tracegazer/invgate-service-desk-mcp -->
+
 > A [Model Context Protocol](https://modelcontextprotocol.io) server for **InvGate Service Desk / Service Management**.
 
 Give your AI assistant full access to your InvGate Service Desk — query incidents, look up users, search the knowledge base, check assets, and manage tickets — all through natural language.
