@@ -23,7 +23,7 @@ MCP (Model Context Protocol) server for the **InvGate Service Desk API**. The go
 
 ## Architecture
 
-Python-based MCP server using the Anthropic MCP SDK (`mcp` package, FastMCP). Modular by domain: each `src/invgate_service_desk_mcp/domains/*.py` module owns its tools and registers them via `register(mcp, client)`. 91 tools across 10 domains (58 read-only + 33 write opt-in). The API spec in `base_conocimiento/` was used to drive tool generation.
+Python-based MCP server using the Anthropic MCP SDK (`mcp` package, FastMCP). Modular by domain: each `src/invgate_service_desk_mcp/domains/*.py` module owns its tools and registers them via `register(mcp, client)`. 96 tools across 11 domains (63 read-only + 33 write opt-in). The API spec in `base_conocimiento/` was used to drive tool generation.
 
 Writes are gated by `INVGATE_WRITE_PROFILE`: `none` (default, read-only), `support` (incidents + time tracking; KB stays read-only), or `full` (incidents + time tracking + Knowledge Base). Legacy `INVGATE_ENABLE_WRITES=1` still works and maps to `full`.
 
