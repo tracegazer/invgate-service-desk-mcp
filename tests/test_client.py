@@ -139,6 +139,32 @@ async def test_writes_enabled_reflects_config():
         await on.aclose()
 
 
+def _profile_client(**kw):
+    return InvGateClient(Config(base_url=BASE, api_token="tok-abc", **kw))
+
+
+def test_writes_enabled_for_support_profile():
+    client = _profile_client(write_profile="support")
+    assert client.writes_enabled_for("incidents") is True
+    assert client.writes_enabled_for("timetracking") is True
+    assert client.writes_enabled_for("kb") is False
+
+
+def test_writes_enabled_for_full_profile():
+    client = _profile_client(write_profile="full")
+    assert client.writes_enabled_for("kb") is True
+
+
+def test_writes_enabled_for_none_profile():
+    client = _profile_client()
+    assert client.writes_enabled_for("incidents") is False
+
+
+def test_writes_enabled_is_any_write():
+    assert _profile_client().writes_enabled is False
+    assert _profile_client(write_profile="support").writes_enabled is True
+
+
 @respx.mock
 async def test_post_sends_form_data_and_drops_none(client):
     route = respx.post(f"{BASE}/api/v1/kb.articles").mock(
