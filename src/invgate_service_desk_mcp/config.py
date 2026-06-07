@@ -40,6 +40,9 @@ class Config:
     # Write tools are registered per-domain according to the resolved profile.
     # "none" (default) is read-only. `enable_writes` is the legacy alias for "full".
     write_profile: str = "none"
+    # Legacy alias for the "full" profile, honored only on direct construction.
+    # NOT populated by Config.load() (it routes the alias through write_profile),
+    # so this field is unreliable at runtime — read write_domains instead.
     enable_writes: bool = False
     # Derived in __post_init__ from write_profile (or enable_writes). Do not set directly.
     write_domains: frozenset[str] = frozenset()
