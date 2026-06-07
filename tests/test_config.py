@@ -117,7 +117,7 @@ def test_writes_disabled_by_default():
 
     config = Config.load(env=env, config_path=Path("/does/not/exist.toml"))
 
-    assert config.enable_writes is False
+    assert config.write_profile == "none"
 
 
 @pytest.mark.parametrize("value", ["1", "true", "TRUE", "yes", "on"])
@@ -130,7 +130,7 @@ def test_enable_writes_from_env_truthy(value):
 
     config = Config.load(env=env, config_path=Path("/does/not/exist.toml"))
 
-    assert config.enable_writes is True
+    assert config.write_profile == "full"
 
 
 @pytest.mark.parametrize("value", ["0", "false", "no", ""])
@@ -143,7 +143,7 @@ def test_enable_writes_from_env_falsy(value):
 
     config = Config.load(env=env, config_path=Path("/does/not/exist.toml"))
 
-    assert config.enable_writes is False
+    assert config.write_profile == "none"
 
 
 def test_enable_writes_from_toml(tmp_path):
@@ -156,7 +156,81 @@ def test_enable_writes_from_toml(tmp_path):
 
     config = Config.load(env={}, config_path=config_file)
 
-    assert config.enable_writes is True
+    assert config.write_profile == "full"
+
+
+def test_profile_from_env():
+    env = {
+        "INVGATE_BASE_URL": "https://x.sd.cloud.invgate.net",
+        "INVGATE_API_TOKEN": "tok",
+        "INVGATE_WRITE_PROFILE": "support",
+    }
+    config = Config.load(env=env, config_path=Path("/does/not/exist.toml"))
+    assert config.write_profile == "support"
+    assert config.write_domains == frozenset({"incidents", "timetracking"})
+
+
+def test_profile_env_is_lowercased():
+    env = {
+        "INVGATE_BASE_URL": "https://x.sd.cloud.invgate.net",
+        "INVGATE_API_TOKEN": "tok",
+        "INVGATE_WRITE_PROFILE": "FULL",
+    }
+    config = Config.load(env=env, config_path=Path("/does/not/exist.toml"))
+    assert config.write_profile == "full"
+
+
+def test_profile_from_toml(tmp_path):
+    config_file = tmp_path / "config.toml"
+    config_file.write_text(
+        'base_url = "https://x.sd.cloud.invgate.net"\n'
+        'api_token = "tok"\n'
+        'write_profile = "support"\n'
+    )
+    config = Config.load(env={}, config_path=config_file)
+    assert config.write_profile == "support"
+
+
+def test_enable_writes_alias_resolves_to_full():
+    env = {
+        "INVGATE_BASE_URL": "https://x.sd.cloud.invgate.net",
+        "INVGATE_API_TOKEN": "tok",
+        "INVGATE_ENABLE_WRITES": "1",
+    }
+    config = Config.load(env=env, config_path=Path("/does/not/exist.toml"))
+    assert config.write_profile == "full"
+
+
+def test_profile_wins_over_enable_writes_with_warning(capsys):
+    env = {
+        "INVGATE_BASE_URL": "https://x.sd.cloud.invgate.net",
+        "INVGATE_API_TOKEN": "tok",
+        "INVGATE_WRITE_PROFILE": "support",
+        "INVGATE_ENABLE_WRITES": "1",
+    }
+    config = Config.load(env=env, config_path=Path("/does/not/exist.toml"))
+    assert config.write_profile == "support"
+    assert "INVGATE_ENABLE_WRITES" in capsys.readouterr().err
+
+
+def test_invalid_profile_from_env_fails_fast():
+    env = {
+        "INVGATE_BASE_URL": "https://x.sd.cloud.invgate.net",
+        "INVGATE_API_TOKEN": "tok",
+        "INVGATE_WRITE_PROFILE": "supprt",
+    }
+    with pytest.raises(ValueError, match="Invalid write profile 'supprt'"):
+        Config.load(env=env, config_path=Path("/does/not/exist.toml"))
+
+
+def test_no_profile_no_alias_defaults_to_none():
+    env = {
+        "INVGATE_BASE_URL": "https://x.sd.cloud.invgate.net",
+        "INVGATE_API_TOKEN": "tok",
+    }
+    config = Config.load(env=env, config_path=Path("/does/not/exist.toml"))
+    assert config.write_profile == "none"
+    assert config.write_domains == frozenset()
 
 
 def test_telemetry_disabled_by_default():

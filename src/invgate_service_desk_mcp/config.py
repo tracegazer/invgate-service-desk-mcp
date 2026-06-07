@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import sys
 import tomllib
 from collections.abc import Mapping
 from dataclasses import dataclass
@@ -86,7 +87,7 @@ class Config:
             or file_values.get("api_username")
             or "api"
         )
-        enable_writes = _resolve_enable_writes(env, file_values)
+        write_profile = _resolve_write_profile(env, file_values)
         telemetry_enabled = _resolve_truthy(
             env, file_values, "INVGATE_TELEMETRY", "telemetry_enabled"
         )
@@ -116,7 +117,7 @@ class Config:
             base_url=base_url.rstrip("/"),
             api_token=api_token,
             api_username=api_username,
-            enable_writes=enable_writes,
+            write_profile=write_profile,
             telemetry_enabled=telemetry_enabled,
             telemetry_detail=telemetry_detail,
         )
@@ -124,6 +125,27 @@ class Config:
 
 def _resolve_enable_writes(env: Mapping[str, str], file_values: dict) -> bool:
     return _resolve_truthy(env, file_values, "INVGATE_ENABLE_WRITES", "enable_writes")
+
+
+def _resolve_write_profile(env: Mapping[str, str], file_values: dict) -> str:
+    """Resolve the write profile. Precedence: explicit profile > ENABLE_WRITES alias > none.
+
+    A profile set alongside a truthy ENABLE_WRITES wins; we warn so the operator
+    notices the alias is being ignored. An invalid profile string is left as-is so
+    Config.__post_init__ fails fast with the full list of valid values.
+    """
+    raw = env.get("INVGATE_WRITE_PROFILE") or file_values.get("write_profile")
+    profile = raw.strip().lower() if raw else None
+    alias_full = _resolve_enable_writes(env, file_values)
+    if profile is not None:
+        if alias_full and profile != "full":
+            print(
+                "WARNING: both INVGATE_WRITE_PROFILE and INVGATE_ENABLE_WRITES are set; "
+                f"using profile '{profile}' and ignoring INVGATE_ENABLE_WRITES.",
+                file=sys.stderr,
+            )
+        return profile
+    return "full" if alias_full else "none"
 
 
 def _resolve_truthy(
