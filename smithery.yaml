@@ -1,0 +1,31 @@
+# Smithery configuration — https://smithery.ai/docs/config#smitheryyaml
+# Local stdio server. Smithery builds the Dockerfile and launches the console
+# script defined in pyproject.toml ([project.scripts] invgate-service-desk-mcp).
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    required:
+      - invgateBaseUrl
+      - invgateApiToken
+    properties:
+      invgateBaseUrl:
+        type: string
+        description: InvGate SD instance base URL, e.g. https://acme.sd.cloud.invgate.net
+      invgateApiToken:
+        type: string
+        description: InvGate Service Desk API token
+      invgateWriteProfile:
+        type: string
+        description: "Write access profile: none (default, read-only) | support | full"
+        default: none
+  commandFunction: |-
+    (config) => ({
+      command: 'invgate-service-desk-mcp',
+      args: [],
+      env: {
+        INVGATE_BASE_URL: config.invgateBaseUrl,
+        INVGATE_API_TOKEN: config.invgateApiToken,
+        INVGATE_WRITE_PROFILE: config.invgateWriteProfile || 'none'
+      }
+    })
