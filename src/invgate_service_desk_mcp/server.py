@@ -86,6 +86,7 @@ def main() -> None:
         print(warning, file=sys.stderr)
 
     config = Config.load(env=os.environ)
+    print(write_profile_banner(config), file=sys.stderr)
     telemetry = build_telemetry(config)
 
     if config.telemetry_enabled:
@@ -110,6 +111,12 @@ def insecure_transport_warning(transport: str) -> str | None:
         "loopback or run it behind an authenticated reverse proxy; never expose it "
         "directly to an untrusted network."
     )
+
+
+def write_profile_banner(config: Config) -> str:
+    """One-line summary of the resolved write profile for the startup log."""
+    domains = ", ".join(sorted(config.write_domains)) or "read-only"
+    return f"write profile: {config.write_profile} ({domains})"
 
 
 def _telemetry_hints(telemetry: Telemetry) -> None:

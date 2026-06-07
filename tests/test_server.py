@@ -293,6 +293,18 @@ async def test_none_profile_registers_no_writes(client):
     assert "create_kb_article" not in names
 
 
+def test_write_profile_banner_lists_resolved_profile():
+    from invgate_service_desk_mcp.server import write_profile_banner
+
+    cfg_none = Config(base_url=BASE, api_token="tok")
+    assert "none" in write_profile_banner(cfg_none)
+
+    cfg_support = Config(base_url=BASE, api_token="tok", write_profile="support")
+    line = write_profile_banner(cfg_support)
+    assert "support" in line
+    assert "incidents" in line and "timetracking" in line
+
+
 async def test_build_server_uses_instrumented_fastmcp_when_telemetry_passed():
     client = InvGateClient(Config(base_url="https://x.net", api_token="t"))
     mcp = build_server(client, telemetry=Telemetry())
