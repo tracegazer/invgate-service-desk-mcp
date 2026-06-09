@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "invgate-service-desk-mcp"
 version = "0.2.0"
-description = "MCP server for the InvGate Service Desk API — 96 tools across 11 domains (incidents, users, KB, custom fields, assets, workflows & more), read-only by default with a none/support/full write profile and optional OpenTelemetry observability."
+description = "InvGate Service Desk MCP — 96 tools across 11 domains (incidents, users, knowledge base, assets, time tracking), read-only by default with a 3-tier write access model (none/support/full), and built-in OpenTelemetry observability."
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "MIT" }

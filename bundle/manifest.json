@@ -4,8 +4,8 @@
   "name": "invgate-service-desk-mcp",
   "display_name": "InvGate Service Desk",
   "version": "0.2.0",
-  "description": "MCP server for the InvGate Service Desk API (incidents, users, KB, workflows, assets).",
-  "long_description": "Exposes InvGate Service Desk operations as MCP tools: incidents CRUD and filtering, users and groups, custom fields, knowledge base, workflows, assets/CIs, breaking news, triggers, time tracking, and data export. Read-only by default; write operations are opt-in via INVGATE_WRITE_PROFILE (none | support | full).",
+  "description": "InvGate Service Desk MCP: 96 tools/11 domains, 3-tier access (none/support/full), OTel.",
+  "long_description": "InvGate Service Desk MCP — 96 tools across 11 domains (incidents, users, knowledge base, assets, time tracking), read-only by default with a 3-tier write access model (none/support/full), and built-in OpenTelemetry observability.",
   "author": {
     "name": "tracegazer",
     "email": "carlsuarez.07@gmail.com"

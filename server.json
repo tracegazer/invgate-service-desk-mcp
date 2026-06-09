@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.tracegazer/invgate-service-desk-mcp",
   "title": "InvGate Service Desk",
-  "description": "InvGate Service Desk MCP: 96 tools across 11 domains, read-only by default with opt-in writes.",
+  "description": "InvGate Service Desk MCP: 96 tools/11 domains, 3-tier access (none/support/full), OTel.",
   "repository": {
     "url": "https://github.com/tracegazer/invgate-service-desk-mcp",
     "source": "github"
