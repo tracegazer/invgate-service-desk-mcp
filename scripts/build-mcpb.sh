@@ -3,7 +3,7 @@
 #
 # The version is taken from pyproject.toml at build time, so the bundle always
 # matches the released package — there is no version to maintain in the manifest.
-# Publish with:  smithery mcp publish ./invgate-service-desk.mcpb -n tracegazer-dev/invgate-service-desk
+# Publish with:  smithery mcp publish ./invgate-service-desk.mcpb -n tracegazer/invgate-service-desk-mcp
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

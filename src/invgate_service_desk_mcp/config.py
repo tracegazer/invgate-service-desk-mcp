@@ -79,7 +79,7 @@ class Config:
         cls,
         env: Mapping[str, str],
         config_path: Path = DEFAULT_CONFIG_PATH,
-    ) -> "Config":
+    ) -> Config:
         """Resolve config from env vars (highest priority) falling back to TOML."""
         file_values = _read_toml(config_path)
 

@@ -62,7 +62,7 @@ async def list_breaking_news_statuses(
     return await client.get("breakingnews.attributes.status", params={"id": status_id})
 
 
-def register(mcp: "FastMCP", client: InvGateClient) -> None:
+def register(mcp: FastMCP, client: InvGateClient) -> None:
     """Register the read-only Breaking News tools on the given MCP server."""
 
     @mcp.tool()

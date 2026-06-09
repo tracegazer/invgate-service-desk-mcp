@@ -169,7 +169,7 @@ async def delete_kb_article(client: InvGateClient, article_id: int) -> Any:
     return await client.delete("kb.articles", params={"id": article_id})
 
 
-def register(mcp: "FastMCP", client: InvGateClient) -> None:
+def register(mcp: FastMCP, client: InvGateClient) -> None:
     """Register the read-only Knowledge Base tools on the given MCP server."""
 
     @mcp.tool()
@@ -243,7 +243,7 @@ def register(mcp: "FastMCP", client: InvGateClient) -> None:
         _register_writes(mcp, client)
 
 
-def _register_writes(mcp: "FastMCP", client: InvGateClient) -> None:
+def _register_writes(mcp: FastMCP, client: InvGateClient) -> None:
     """Register the KB write tools. Called only when writes are enabled."""
 
     @mcp.tool()

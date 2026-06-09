@@ -129,7 +129,7 @@ async def list_company_observers(
     return await client.get("companies.observers", params={"ids": ids})
 
 
-def register(mcp: "FastMCP", client: InvGateClient) -> None:
+def register(mcp: FastMCP, client: InvGateClient) -> None:
     """Register the read-only organizational-structure tools on the MCP server."""
 
     @mcp.tool()

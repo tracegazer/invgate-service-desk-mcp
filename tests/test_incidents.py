@@ -103,7 +103,7 @@ async def test_list_incidents_by_agent_raises_on_unexpected_shape(client):
         return_value=httpx.Response(200, json={"status": "ERROR"})
     )
 
-    with pytest.raises(UnexpectedShapeError, match="incidents.by.agent"):
+    with pytest.raises(UnexpectedShapeError, match=r"incidents\.by\.agent"):
         await incidents.list_incidents_by_agent(client, id=18)
 
 

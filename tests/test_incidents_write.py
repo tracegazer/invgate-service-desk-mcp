@@ -111,7 +111,9 @@ async def test_promote_incident_to_major(client):
 async def test_reassign_incident(client):
     route = respx.post(f"{API}/incident.reassign").mock(return_value=httpx.Response(200, json={}))
 
-    await incidents.reassign_incident(client, request_id=100, author_id=5, group_id=159, agent_id=343)
+    await incidents.reassign_incident(
+        client, request_id=100, author_id=5, group_id=159, agent_id=343
+    )
 
     body = form(route)
     for token in ("request_id=100", "author_id=5", "group_id=159", "agent_id=343"):

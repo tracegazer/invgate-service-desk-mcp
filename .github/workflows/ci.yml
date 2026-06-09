@@ -12,21 +12,41 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.12", "3.13"]
-
     steps:
-      - uses: actions/checkout@v4
-
+      - uses: actions/checkout@v6
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
-
+        uses: astral-sh/setup-uv@v8.2.0
+        with:
+          enable-cache: true
       - name: Set up Python ${{ matrix.python-version }}
         run: uv python install ${{ matrix.python-version }}
-
       - name: Install dependencies
         run: uv sync --extra dev
-
       - name: Lint
         run: uv run ruff check src/ tests/
-
       - name: Test
         run: uv run pytest tests/ -q
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.2.0
+        with:
+          enable-cache: true
+      - name: Build sdist + wheel
+        run: uv build
+      - name: Verify wheel installs and imports
+        run: uv run --no-project --with dist/*.whl python -c "import invgate_service_desk_mcp; print(invgate_service_desk_mcp.__version__)"
+
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.2.0
+        with:
+          enable-cache: true
+      - name: Audit dependencies for known vulnerabilities
+        run: uvx pip-audit

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/tracegazer/invgate-service-desk-mcp/security/advisories/new
+    about: Please report security issues privately, not as public issues.
+  - name: Usage and configuration
+    url: https://github.com/tracegazer/invgate-service-desk-mcp#readme
+    about: Setup, configuration, and write-profile questions are covered in the README.

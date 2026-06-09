@@ -111,7 +111,7 @@ async def delete_time_entry(
     )
 
 
-def register(mcp: "FastMCP", client: InvGateClient) -> None:
+def register(mcp: FastMCP, client: InvGateClient) -> None:
     """Register the read-only time tracking tools on the given MCP server."""
 
     @mcp.tool()
@@ -141,7 +141,7 @@ def register(mcp: "FastMCP", client: InvGateClient) -> None:
         _register_writes(mcp, client)
 
 
-def _register_writes(mcp: "FastMCP", client: InvGateClient) -> None:
+def _register_writes(mcp: FastMCP, client: InvGateClient) -> None:
     """Register the time tracking write tools. Called only when writes are enabled."""
 
     @mcp.tool()

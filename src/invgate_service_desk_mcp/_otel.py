@@ -5,14 +5,13 @@ from __future__ import annotations
 
 import contextlib
 import json
+import logging
 import os
 import re
 import time
 from importlib.metadata import PackageNotFoundError, version
 from typing import TYPE_CHECKING, Any
 from urllib.parse import urlparse
-
-import logging
 
 from opentelemetry import metrics, trace
 from opentelemetry._logs import set_logger_provider
@@ -53,7 +52,7 @@ def _package_version() -> str:
 
 
 class _ClientSpan:
-    def __init__(self, span, telemetry: "OTelTelemetry", endpoint: str):
+    def __init__(self, span, telemetry: OTelTelemetry, endpoint: str):
         self._span = span
         self._telemetry = telemetry
         self._endpoint = endpoint
@@ -77,7 +76,7 @@ class _ClientSpan:
 class OTelTelemetry(Telemetry):
     enabled = True
 
-    def __init__(self, config: "Config"):
+    def __init__(self, config: Config):
         ver = _package_version()
         resource = Resource.create({"service.name": _service_name(), "service.version": ver})
         tracer_provider = TracerProvider(resource=resource)
@@ -98,7 +97,10 @@ class OTelTelemetry(Telemetry):
         """Build an instance against caller-supplied providers (no global state,
         no network). Used by tests."""
         self = cls.__new__(cls)
-        self._init(config, tracer_provider, meter_provider, logger_provider or LoggerProvider(), _package_version())
+        self._init(
+            config, tracer_provider, meter_provider,
+            logger_provider or LoggerProvider(), _package_version(),
+        )
         return self
 
     def _init(self, config, tracer_provider, meter_provider, logger_provider, ver):
@@ -122,7 +124,9 @@ class OTelTelemetry(Telemetry):
             "invgate.response.item_count", unit="{item}", description="InvGate response item count"
         )
         self._response_size = meter.create_histogram(
-            "invgate.response.size", unit="{character}", description="InvGate response size in chars"
+            "invgate.response.size",
+            unit="{character}",
+            description="InvGate response size in chars",
         )
         self._tool_errors = meter.create_counter(
             "mcp.tool.errors", description="MCP tool failures"

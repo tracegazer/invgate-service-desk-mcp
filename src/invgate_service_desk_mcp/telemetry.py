@@ -47,7 +47,7 @@ class Telemetry:
         pass
 
 
-def build_telemetry(config: "Config") -> Telemetry:
+def build_telemetry(config: Config) -> Telemetry:
     """Return a no-op `Telemetry` unless the operator opted in.
 
     The OTel import and provider setup are deferred to `OTelTelemetry` so the
@@ -55,7 +55,7 @@ def build_telemetry(config: "Config") -> Telemetry:
     """
     if not config.telemetry_enabled:
         return Telemetry()
-    from ._otel import OTelTelemetry  # noqa: PLC0415  (lazy by design)
+    from ._otel import OTelTelemetry
 
     return OTelTelemetry(config)
 

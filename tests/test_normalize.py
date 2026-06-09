@@ -115,10 +115,11 @@ def test_as_list_error_names_the_source_and_observed_keys():
 
 
 def test_as_list_logs_warning_on_unexpected_shape(caplog):
+    import contextlib
     import logging
-    with caplog.at_level(logging.WARNING, logger="invgate_service_desk_mcp.normalize"):
-        try:
-            as_list({"status": "ERROR"}, source="incidents.by.agent")
-        except UnexpectedShapeError:
-            pass
+    with (
+        caplog.at_level(logging.WARNING, logger="invgate_service_desk_mcp.normalize"),
+        contextlib.suppress(UnexpectedShapeError),
+    ):
+        as_list({"status": "ERROR"}, source="incidents.by.agent")
     assert any("incidents.by.agent" in r.message for r in caplog.records)

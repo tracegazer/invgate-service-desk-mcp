@@ -50,7 +50,7 @@ async def list_sources(client: InvGateClient, *, id: int | None = None) -> Any:
     return await client.get("incident.attributes.source", params={"id": id})
 
 
-def register(mcp: "FastMCP", client: InvGateClient) -> None:
+def register(mcp: FastMCP, client: InvGateClient) -> None:
     """Register the catalog/reference-data tools on the given MCP server."""
 
     @mcp.tool()

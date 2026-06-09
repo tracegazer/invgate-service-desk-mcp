@@ -14,7 +14,6 @@ from typing import Literal
 
 from .client import InvGateClient
 from .config import Config
-from .telemetry import InstrumentedFastMCP, Telemetry, build_telemetry
 from .domains import (
     assets,
     breaking_news,
@@ -28,6 +27,7 @@ from .domains import (
     users,
     workflows,
 )
+from .telemetry import InstrumentedFastMCP, Telemetry, build_telemetry
 
 INSTRUCTIONS = """\
 Tools for the InvGate Service Desk API. 96 tools across 11 domains: incidents, \
