@@ -50,7 +50,7 @@ async def test_list_incidents_by_asset_raises_on_unexpected_shape(client):
         return_value=httpx.Response(200, json={"status": "ERROR"})
     )
 
-    with pytest.raises(UnexpectedShapeError, match="incidents.by.asset"):
+    with pytest.raises(UnexpectedShapeError, match=r"incidents\.by\.asset"):
         await assets.list_incidents_by_asset(client, asset_id=5)
 
 

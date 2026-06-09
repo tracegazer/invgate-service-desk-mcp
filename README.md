@@ -1,5 +1,12 @@
 # invgate-service-desk-mcp
 
+[![CI](https://github.com/tracegazer/invgate-service-desk-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/tracegazer/invgate-service-desk-mcp/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/invgate-service-desk-mcp)](https://pypi.org/project/invgate-service-desk-mcp/)
+[![Python](https://img.shields.io/pypi/pyversions/invgate-service-desk-mcp)](https://pypi.org/project/invgate-service-desk-mcp/)
+[![License: MIT](https://img.shields.io/pypi/l/invgate-service-desk-mcp)](LICENSE)
+[![MCP Registry](https://img.shields.io/badge/MCP_Registry-published-0a7ea4)](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.tracegazer/invgate-service-desk-mcp)
+[![Smithery](https://smithery.ai/badge/tracegazer/invgate-service-desk-mcp)](https://smithery.ai/servers/tracegazer/invgate-service-desk-mcp)
+
 <!-- mcp-name: io.github.tracegazer/invgate-service-desk-mcp -->
 
 > A [Model Context Protocol](https://modelcontextprotocol.io) server for **InvGate Service Desk / Service Management**.
@@ -7,6 +14,14 @@
 Give your AI assistant full access to your InvGate Service Desk — query incidents, look up users, search the knowledge base, check assets, and manage tickets — all through natural language.
 
 **96 tools** across 11 domains. Read-only by default, with optional write operations behind explicit opt-in.
+
+## Install in one click
+
+The easiest way to use this server with **Claude Desktop** (and other MCPB-compatible clients) is the prebuilt bundle:
+
+**➡️ [Download `invgate-service-desk.mcpb`](https://github.com/tracegazer/invgate-service-desk-mcp/releases/latest/download/invgate-service-desk.mcpb)** — then double-click it. Claude Desktop opens the installer, prompts for your InvGate base URL and API token, and you're done. No Python, no `npx`/`uvx`, no config files.
+
+The `.mcpb` is attached to every [GitHub Release](https://github.com/tracegazer/invgate-service-desk-mcp/releases) and mirrored on [Smithery](https://smithery.ai/). Prefer a package manager or container? See [Quick start](#quick-start) below.
 
 ## What can it do?
 

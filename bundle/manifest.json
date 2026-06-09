@@ -3,7 +3,7 @@
   "manifest_version": "0.4",
   "name": "invgate-service-desk-mcp",
   "display_name": "InvGate Service Desk",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "MCP server for the InvGate Service Desk API (incidents, users, KB, workflows, assets).",
   "long_description": "Exposes InvGate Service Desk operations as MCP tools: incidents CRUD and filtering, users and groups, custom fields, knowledge base, workflows, assets/CIs, breaking news, triggers, time tracking, and data export. Read-only by default; write operations are opt-in via INVGATE_WRITE_PROFILE (none | support | full).",
   "author": {

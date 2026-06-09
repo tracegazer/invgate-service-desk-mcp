@@ -55,7 +55,7 @@ async def get_workflow_field_list_values(
     )
 
 
-def register(mcp: "FastMCP", client: InvGateClient) -> None:
+def register(mcp: FastMCP, client: InvGateClient) -> None:
     """Register the read-only workflow tools on the given MCP server."""
 
     @mcp.tool()

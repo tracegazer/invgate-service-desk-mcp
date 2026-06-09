@@ -24,7 +24,7 @@ async def list_trigger_executions(client: InvGateClient, trigger_id: int) -> Any
     return await client.get("triggers.executions", params={"trigger_id": trigger_id})
 
 
-def register(mcp: "FastMCP", client: InvGateClient) -> None:
+def register(mcp: FastMCP, client: InvGateClient) -> None:
     """Register the read-only trigger tools on the given MCP server."""
 
     @mcp.tool()

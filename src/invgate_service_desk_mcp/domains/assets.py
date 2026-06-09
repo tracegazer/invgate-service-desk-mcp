@@ -85,7 +85,7 @@ async def get_linked_cis_counters(
     )
 
 
-def register(mcp: "FastMCP", client: InvGateClient) -> None:
+def register(mcp: FastMCP, client: InvGateClient) -> None:
     """Register the read-only asset/CI tools on the given MCP server."""
 
     @mcp.tool()

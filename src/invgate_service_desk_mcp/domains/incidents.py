@@ -154,7 +154,7 @@ def _require_identifier(id: int | None, email: str | None, username: str | None)
         raise ValueError("Provide one of: id, email or username.")
 
 
-def register(mcp: "FastMCP", client: InvGateClient) -> None:
+def register(mcp: FastMCP, client: InvGateClient) -> None:
     """Register the read-only incident tools on the given MCP server."""
 
     @mcp.tool()
@@ -716,7 +716,7 @@ async def reject_incident_solution(
     )
 
 
-def _register_writes(mcp: "FastMCP", client: InvGateClient) -> None:
+def _register_writes(mcp: FastMCP, client: InvGateClient) -> None:
     """Register the incident write tools. Called only when writes are enabled."""
 
     @mcp.tool()

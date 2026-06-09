@@ -1,0 +1,46 @@
+name: Bug report
+description: Report a problem with invgate-service-desk-mcp
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the bug and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Tool called, arguments, and the prompt/client used.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: invgate-service-desk-mcp version
+      placeholder: "0.2.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: write-profile
+    attributes:
+      label: Write profile
+      options:
+        - none
+        - support
+        - full
+    validations:
+      required: false
+  - type: input
+    id: client
+    attributes:
+      label: MCP client
+      placeholder: "Claude Desktop / Cursor / ..."
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Relevant error output. Redact your API token and any IDs you consider sensitive.
+      render: shell

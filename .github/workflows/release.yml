@@ -1,0 +1,182 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.2.0
+        with:
+          enable-cache: true
+      - name: Build sdist + wheel
+        run: uv build
+      - name: Verify built version matches the tag
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          PKG_VERSION=$(python3 -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          echo "tag=$TAG package=$PKG_VERSION"
+          if [ "$TAG" != "v$PKG_VERSION" ]; then
+            echo "::error::Tag $TAG does not match package version v$PKG_VERSION"
+            exit 1
+          fi
+      - name: Upload distributions
+        uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+      - name: Build MCPB bundle
+        run: bash scripts/build-mcpb.sh
+      - name: Upload MCPB bundle
+        uses: actions/upload-artifact@v7
+        with:
+          name: mcpb
+          path: invgate-service-desk.mcpb
+
+  pypi-publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write  # OIDC for PyPI Trusted Publishing — no token needed
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  github-release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # create the GitHub release
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+      - name: Download MCPB bundle
+        uses: actions/download-artifact@v8
+        with:
+          name: mcpb
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v3
+        with:
+          files: |
+            dist/*
+            invgate-service-desk.mcpb
+          generate_release_notes: true
+
+  docker-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write  # push to ghcr.io
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v4
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/tracegazer/invgate-service-desk-mcp
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest
+      - name: Build and push
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          provenance: false
+
+  mcp-registry-publish:
+    needs: [pypi-publish, docker-publish]  # the registry validates both packages exist before accepting
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # OIDC for MCP Registry auth (io.github.* namespace) — no token
+    steps:
+      - uses: actions/checkout@v6
+      - name: Stamp server.json with the tag version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          VERSION="${TAG#v}"
+          python3 - "$VERSION" <<'PY'
+          import json, re, sys
+          version = sys.argv[1]
+          with open("server.json") as fh:
+              data = json.load(fh)
+          data["version"] = version
+          for pkg in data.get("packages", []):
+              if "version" in pkg:
+                  pkg["version"] = version
+              if pkg.get("registryType") == "oci":
+                  # rewrite the :tag on the OCI image reference
+                  pkg["identifier"] = re.sub(r":[^:/]+$", ":" + version, pkg["identifier"])
+          with open("server.json", "w") as fh:
+              json.dump(data, fh, indent=2)
+              fh.write("\n")
+          print("stamped server.json ->", version)
+          PY
+      - name: Install mcp-publisher
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          URL=$(gh api repos/modelcontextprotocol/registry/releases/latest \
+            --jq '.assets[] | select(.name | test("linux.*(amd64|x86_64).*tar.gz$")) | .browser_download_url' \
+            | head -n1)
+          echo "downloading $URL"
+          curl -sL "$URL" | tar xz mcp-publisher
+          ./mcp-publisher --version || true
+      - name: Log in to the MCP Registry (GitHub OIDC)
+        run: ./mcp-publisher login github-oidc
+      - name: Publish to the MCP Registry
+        run: ./mcp-publisher publish
+
+  smithery-publish:
+    needs: [build, pypi-publish]  # reuse the build job's bundle; PyPI live first (.mcpb runs `uvx invgate-service-desk-mcp`)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+      - name: Download MCPB bundle
+        uses: actions/download-artifact@v8
+        with:
+          name: mcpb
+      - name: Publish to Smithery
+        env:
+          SMITHERY_API_KEY: ${{ secrets.SMITHERY_API_KEY }}
+        run: |
+          if [ -z "$SMITHERY_API_KEY" ]; then
+            echo "::warning::SMITHERY_API_KEY secret not set — skipping Smithery publish"
+            exit 0
+          fi
+          npx -y smithery@latest mcp publish ./invgate-service-desk.mcpb -n tracegazer/invgate-service-desk-mcp

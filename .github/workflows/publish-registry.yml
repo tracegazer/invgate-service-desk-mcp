@@ -1,0 +1,29 @@
+name: Publish to MCP Registry
+
+# Manual republish of server.json to the official MCP Registry, decoupled from a
+# release tag. Use it to fix metadata (e.g. description) without cutting a new
+# version, or to retry after making the GHCR image public.
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # OIDC for MCP Registry auth (io.github.* namespace)
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install mcp-publisher
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          URL=$(gh api repos/modelcontextprotocol/registry/releases/latest \
+            --jq '.assets[] | select(.name | test("linux.*(amd64|x86_64).*tar.gz$")) | .browser_download_url' \
+            | head -n1)
+          echo "downloading $URL"
+          curl -sL "$URL" | tar xz mcp-publisher
+          ./mcp-publisher --version || true
+      - name: Log in to the MCP Registry (GitHub OIDC)
+        run: ./mcp-publisher login github-oidc
+      - name: Publish to the MCP Registry
+        run: ./mcp-publisher publish

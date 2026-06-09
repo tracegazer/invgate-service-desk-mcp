@@ -2,8 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from invgate_service_desk_mcp.config import Config, ConfigError
-from invgate_service_desk_mcp.config import WRITE_PROFILES
+from invgate_service_desk_mcp.config import WRITE_PROFILES, Config, ConfigError
 
 
 def test_write_profiles_map_contents():

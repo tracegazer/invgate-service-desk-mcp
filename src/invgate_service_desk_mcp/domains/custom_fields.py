@@ -75,7 +75,7 @@ async def get_custom_field_tree_options(client: InvGateClient, uid: int) -> Any:
     return await client.get("cf.field.options.tree", params={"uid": uid})
 
 
-def register(mcp: "FastMCP", client: InvGateClient) -> None:
+def register(mcp: FastMCP, client: InvGateClient) -> None:
     """Register the read-only custom-field tools on the given MCP server."""
 
     @mcp.tool()

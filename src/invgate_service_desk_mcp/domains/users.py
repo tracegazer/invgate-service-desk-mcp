@@ -125,7 +125,7 @@ async def list_companies(
     )
 
 
-def register(mcp: "FastMCP", client: InvGateClient) -> None:
+def register(mcp: FastMCP, client: InvGateClient) -> None:
     """Register the read-only user/group tools on the given MCP server."""
 
     @mcp.tool()

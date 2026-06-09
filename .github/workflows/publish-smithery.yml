@@ -1,0 +1,34 @@
+name: Publish to Smithery
+
+# Manual publish of the .mcpb bundle to Smithery, decoupled from a release tag.
+# Requires the SMITHERY_API_KEY repo secret — this must be an API KEY minted at
+# https://smithery.ai/account/api-keys (NOT a `smithery auth token`, which expires
+# in <= 24h).
+on:
+  workflow_dispatch:
+    inputs:
+      namespace:
+        description: "Smithery namespace (org/server)"
+        required: true
+        default: "tracegazer/invgate-service-desk-mcp"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+      - name: Build MCPB bundle
+        run: bash scripts/build-mcpb.sh
+      - name: Publish to Smithery
+        env:
+          SMITHERY_API_KEY: ${{ secrets.SMITHERY_API_KEY }}
+          NAMESPACE: ${{ inputs.namespace }}
+        run: |
+          if [ -z "$SMITHERY_API_KEY" ]; then
+            echo "::error::SMITHERY_API_KEY secret not set — add it in Settings -> Secrets -> Actions"
+            exit 1
+          fi
+          npx -y smithery@latest mcp publish ./invgate-service-desk.mcpb -n "$NAMESPACE"
