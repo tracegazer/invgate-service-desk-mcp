@@ -5,7 +5,7 @@
 [![Python](https://img.shields.io/pypi/pyversions/invgate-service-desk-mcp)](https://pypi.org/project/invgate-service-desk-mcp/)
 [![License: MIT](https://img.shields.io/pypi/l/invgate-service-desk-mcp)](LICENSE)
 [![MCP Registry](https://img.shields.io/badge/MCP_Registry-published-0a7ea4)](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.tracegazer/invgate-service-desk-mcp)
-[![Smithery](https://smithery.ai/badge/tracegazer/invgate-service-desk-mcp)](https://smithery.ai/servers/tracegazer/invgate-service-desk-mcp)
+[![LightNow capabilities](https://lightnow.ai/badge/io.github.tracegazer/invgate-service-desk-mcp)](https://lightnow.ai/servers/io.github.tracegazer/invgate-service-desk-mcp)
 
 <!-- mcp-name: io.github.tracegazer/invgate-service-desk-mcp -->
 
